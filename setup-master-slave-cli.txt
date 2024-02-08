@@ -116,6 +116,9 @@ $ kubectl top nodes
 $ kubectl top pod -n kube-system
 $ kubectl top nodes --sort-by=cpu (can sort by "cpu" or "memory")
 
+Client Node: get kubeconfig file from master node "/etc/kubernetes/admin.conf"
+$ kubectl get pods --kubeconfig kubeconfig --insecure-skip-tls-verify
+
 
 
 
