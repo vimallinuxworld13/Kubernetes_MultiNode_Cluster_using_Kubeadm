@@ -1,6 +1,13 @@
 Reference Doc:
 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-runtime
 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+https://cri-o.io/
+https://github.com/cri-o/cri-o/blob/main/install.md
+https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
+https://github.com/kubernetes-sigs/metrics-server
+https://datacenterdope.wordpress.com/2020/01/20/installing-kubernetes-metrics-server-with-kubeadm/#:~:text=Install%20Metrics%2Dserver%20on%20a,metrics%2Dserver'...
+
+
 
 
 For best performance, Kubernetes requires that swap is disabled on the master/slave system, edit the /etc/fstab file To make the changes persistent
@@ -23,6 +30,12 @@ net.bridge.bridge-nf-call-ip6tables = 1
 
 sysctl --system
 
+# Set SELinux in permissive mode (effectively disabling it)
+# disable SELinux and set it to ‘permissive’ in order to allow smooth communication between the nodes and the pods.
+$ setenforce 0
+$ sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+
+
 Container Runtime is an application that supports running containers, we will install CRI-O
 $ export VERSION=1.26
 $ curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8/devel:kubic:libcontainers:stable.repo
@@ -33,10 +46,6 @@ $ systemctl enable crio
 $ systemctl start crio
 
 
-# Set SELinux in permissive mode (effectively disabling it)
-# disable SELinux and set it to ‘permissive’ in order to allow smooth communication between the nodes and the pods.
-$ setenforce 0
-$ sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 
 
 # This overwrites any existing configuration in /etc/yum.repos.d/kubernetes.repo
@@ -68,6 +77,11 @@ $ kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 After Installing Calico CNI, nodes state will change to Ready state, DNS service inside the cluster would be functional and containers can start communicating with each other.
 To install Calico CNI, run the following command from the master node
 $ kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+or 
+$ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/tigera-operator.yaml
+$ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/custom-resources.yaml
+$ watch kubectl get pods -n calico-system
+
 
 
 $ kubectl get pods -n kube-system
@@ -100,6 +114,7 @@ $ kubectl top nodes
 Once the metrics server objects are deployed, it takes a minute for you to see the node and pod metrics using the top command.
 $ kubectl top nodes
 $ kubectl top pod -n kube-system
+$ kubectl top nodes --sort-by=cpu (can sort by "cpu" or "memory")
 
 
 
