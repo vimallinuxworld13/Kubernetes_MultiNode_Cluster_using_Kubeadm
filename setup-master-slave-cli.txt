@@ -79,7 +79,12 @@ After Installing Calico CNI, nodes state will change to Ready state, DNS service
 To install Calico CNI, run the following command from the master node
 $ kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
 or 
+
+
 $ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/tigera-operator.yaml
+
+Before creating this manifest, read its contents and make sure its settings are correct for your environment. For example, you may need to change the default IP pool CIDR to match your pod network CIDR.
+
 $ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/custom-resources.yaml
 $ watch kubectl get pods -n calico-system
 
