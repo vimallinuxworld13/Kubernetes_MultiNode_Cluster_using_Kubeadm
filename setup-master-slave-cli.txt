@@ -1,7 +1,10 @@
 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-runtime
 
-swapoff -a
-dnf install -y iproute-tc
+For best performance, Kubernetes requires that swap is disabled on the master/slave system, edit the /etc/fstab file To make the changes persistent
+$ swapoff -a
+
+install the traffic control utility package
+$ dnf install -y iproute-tc
 
 vi /etc/modules-load.d/k8s.conf
 overlay
@@ -17,18 +20,20 @@ net.bridge.bridge-nf-call-ip6tables = 1
 
 sysctl --system
 
-export VERSION=1.26
-curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8/devel:kubic:libcontainers:stable.repo
-curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$VERSION/CentOS_8/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo
+Container Runtime is an application that supports running containers, we will install CRI-O
+$ export VERSION=1.26
+$ curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8/devel:kubic:libcontainers:stable.repo
+$ curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$VERSION/CentOS_8/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo
 
-dnf install cri-o
-systemctl enable crio
-systemctl start crio
+$ dnf install cri-o
+$ systemctl enable crio
+$ systemctl start crio
 
 
 # Set SELinux in permissive mode (effectively disabling it)
-sudo setenforce 0
-sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+# disable SELinux and set it to ‘permissive’ in order to allow smooth communication between the nodes and the pods.
+$ setenforce 0
+$ sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 
 
 # This overwrites any existing configuration in /etc/yum.repos.d/kubernetes.repo
@@ -46,8 +51,8 @@ EOF
 sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 sudo systemctl enable --now kubelet
 
-
-kubeadm init --pod-network-cidr=192.168.10.0/16
+initialize a Kubernetes cluster using the kubeadm command as follows. This initializes a control plane in the master node.
+$ kubeadm init --pod-network-cidr=192.168.10.0/16
 
 
 $ mkdir -p $HOME/.kube
@@ -56,19 +61,21 @@ $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 kubectl taint nodes --all node-role.kubernetes.io/master-
 
-
-kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
-kubectl get pods -n kube-system
-
-kubectl get nodes
-kubectl get nodes -o wide
-
-kubectl get pods --all-namespaces
+After Installing Calico CNI, nodes state will change to Ready state, DNS service inside the cluster would be functional and containers can start communicating with each other.
+To install Calico CNI, run the following command from the master node
+$ kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
 
 
+$ kubectl get pods -n kube-system
 
-kubeadm join 10.128.15.228:6443 --token cqb8vy.iicmmqrb1m8u9cob --discovery-token-ca-cert-hash sha256:79748a56f603e6cc57f67bf90b7db5aebe090107d540d6cc8a8f65b785de7543
+$ kubectl get nodes
+$ kubectl get nodes -o wide
 
-kubectl get nodes
+$ kubectl get pods --all-namespaces
+
+add the worker node to the Kubernetes cluster
+$ kubeadm join 10.128.15.228:6443 --token cqb8vy.iicmmqrb1m8u9cob --discovery-token-ca-cert-hash sha256:79748a56f603e6cc57f67bf90b7db5aebe090107d540d6cc8a8f65b785de7543
+
+$ kubectl get nodes
 
 
