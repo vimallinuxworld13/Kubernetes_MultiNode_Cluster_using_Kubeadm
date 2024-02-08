@@ -1,4 +1,7 @@
+Reference Doc:
 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-runtime
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
 
 For best performance, Kubernetes requires that swap is disabled on the master/slave system, edit the /etc/fstab file To make the changes persistent
 $ swapoff -a
@@ -59,7 +62,8 @@ $ mkdir -p $HOME/.kube
 $ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-kubectl taint nodes --all node-role.kubernetes.io/master-
+By default, apps won’t get scheduled on the master node. If you want to use the master node for scheduling apps, taint the master node.
+$ kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 
 After Installing Calico CNI, nodes state will change to Ready state, DNS service inside the cluster would be functional and containers can start communicating with each other.
 To install Calico CNI, run the following command from the master node
@@ -73,9 +77,32 @@ $ kubectl get nodes -o wide
 
 $ kubectl get pods --all-namespaces
 
+You verify all the cluster component health statuses using the following command.
+$ kubectl get --raw='/readyz?verbose'
+
+$ kubectl cluster-info 
+
+If you missed copying the join command, execute the following command in the master node to recreate the token with the join command
+$ kubeadm token create --print-join-command
+
 add the worker node to the Kubernetes cluster
 $ kubeadm join 10.128.15.228:6443 --token cqb8vy.iicmmqrb1m8u9cob --discovery-token-ca-cert-hash sha256:79748a56f603e6cc57f67bf90b7db5aebe090107d540d6cc8a8f65b785de7543
 
+
 $ kubectl get nodes
+$ kubectl label node  ip-172-31-42-227.ap-south-1.compute.internal   node-role.kubernetes.io/worker=worker
+
+
+Kubeadm doesn’t install metrics server component during its initialization.
+$ kubectl apply -f https://raw.githubusercontent.com/techiescamp/kubeadm-scripts/main/manifests/metrics-server.yaml
+$ kubectl top nodes
+
+Once the metrics server objects are deployed, it takes a minute for you to see the node and pod metrics using the top command.
+$ kubectl top nodes
+$ kubectl top pod -n kube-system
+
+
+
+
 
 
