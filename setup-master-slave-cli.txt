@@ -64,7 +64,7 @@ EOF
 sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 sudo systemctl enable --now kubelet
 
-initialize a Kubernetes cluster using the kubeadm command as follows. This initializes a control plane in the master node.
+initialize a Kubernetes cluster using the kubeadm command as follows. This initializes a control plane in the master node., use network range of kube server below cidr
 $ kubeadm init --pod-network-cidr=192.168.10.0/16
 
 
