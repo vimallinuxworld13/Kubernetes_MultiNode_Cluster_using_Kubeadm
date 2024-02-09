@@ -7,6 +7,7 @@ https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
 https://github.com/kubernetes-sigs/metrics-server
 https://datacenterdope.wordpress.com/2020/01/20/installing-kubernetes-metrics-server-with-kubeadm/#:~:text=Install%20Metrics%2Dserver%20on%20a,metrics%2Dserver'...
 https://www.tutorialworks.com/difference-docker-containerd-runc-crio-oci/
+https://github.com/projectcalico/calico/tree/master/manifests
 
 
 
