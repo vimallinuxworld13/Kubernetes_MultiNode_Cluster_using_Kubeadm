@@ -94,6 +94,10 @@ $ watch kubectl get pods -n calico-system
 or 
 curl -O https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/calico.yaml
 
+or
+(this link work perfectly)
+https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
+
 # Auto-detect the BGP IP address.
             - name: IP
               value: "autodetect"
@@ -122,6 +126,10 @@ $ kubeadm token create --print-join-command
 add the worker node to the Kubernetes cluster
 $ kubeadm join 10.128.15.228:6443 --token cqb8vy.iicmmqrb1m8u9cob --discovery-token-ca-cert-hash sha256:79748a56f603e6cc57f67bf90b7db5aebe090107d540d6cc8a8f65b785de7543
 
+$ kubectl  get pods -n kube-system
+$ kubectl -n kube-system exec -it calico-node-5k4kh -- calico-node -show-status
+$ kubectl -n kube-system exec -it calico-node-5k4kh -- calico-node -bird-ready
+$ kubectl -n kube-system exec -it calico-node-5k4kh -- calico-node -bird-live
 
 $ kubectl get nodes
 $ kubectl label node  ip-172-31-42-227.ap-south-1.compute.internal   node-role.kubernetes.io/worker=worker
@@ -130,6 +138,14 @@ $ kubectl label node  ip-172-31-42-227.ap-south-1.compute.internal   node-role.k
 Kubeadm doesn’t install metrics server component during its initialization.
 $ kubectl apply -f https://raw.githubusercontent.com/techiescamp/kubeadm-scripts/main/manifests/metrics-server.yaml
 $ kubectl top nodes
+
+$ kubectl create deployment lwdeploy1 --image=vimal13/apache-webserver-php --replicas=5
+$ kubectl expose deployment lwdeploy1 --type=NodePort --port=80
+
+$ kubectl  exec -it lwdeploy1-67465f89c6-2qlw5 -- bash
+[root@lwdeploy1-67465f89c6-2qlw5 /]# curl  192.168.201.1
+
+
 
 Once the metrics server objects are deployed, it takes a minute for you to see the node and pod metrics using the top command.
 $ kubectl top nodes
