@@ -167,7 +167,15 @@ Client Node: get kubeconfig file from master node "/etc/kubernetes/admin.conf"
 $ kubectl get pods --kubeconfig kubeconfig --insecure-skip-tls-verify
 
 
+Reset Cluster
 $ kubeadm reset
+$ cd /etc/cni/net.d/
+$ rm calico-kubeconfig
+$ rm 10-calico.conflist
+$ iptables -F  
+$ iptables -t nat -F
+$ iptables -t mangle  -F
+
 
 
 
