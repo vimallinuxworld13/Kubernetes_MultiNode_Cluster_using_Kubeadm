@@ -167,6 +167,8 @@ Client Node: get kubeconfig file from master node "/etc/kubernetes/admin.conf"
 $ kubectl get pods --kubeconfig kubeconfig --insecure-skip-tls-verify
 
 
+$ kubeadm reset
+
 
 
 
