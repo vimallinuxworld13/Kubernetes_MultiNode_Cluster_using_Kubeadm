@@ -143,6 +143,16 @@ $ kubectl top nodes
 $ kubectl create deployment lwdeploy1 --image=vimal13/apache-webserver-php --replicas=5
 $ kubectl expose deployment lwdeploy1 --type=NodePort --port=80
 
+$ kubectl edit deploy lwdeploy1
+$ kubectl  label node ip-172-31-35-26.ap-south-1.compute.internal region=india
+spec:
+      containers:
+      - image: vimal13/apache-webserver-php
+        name: apache-webserver-php
+      nodeSelector:
+        region: india
+
+
 $ kubectl  exec -it lwdeploy1-67465f89c6-2qlw5 -- bash
 [root@lwdeploy1-67465f89c6-2qlw5 /]# curl  192.168.201.1
 
